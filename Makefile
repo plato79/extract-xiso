@@ -11,6 +11,11 @@ MAKE=make
 LD_FLAGS=
 endif
 
+ifeq ($(CC),)
+  CC=gcc
+endif
+
+
 extract-xiso: extract-xiso.c
 	@echo "compiling extract-xiso for ${TARGET_OS}"
 	@echo
@@ -22,9 +27,9 @@ ifeq (${TARGET_OS},__DARWIN__)
 endif
 	${MAKE} libftp
 ifeq (${TARGET_OS},__DARWIN__)
-	gcc -O2 ${LD_FLAGS} -o extract-xiso -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a -framework CoreFoundation -framework DiscRecording
+	$(CC) -O2 ${LD_FLAGS} -o extract-xiso -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a -framework CoreFoundation -framework DiscRecording
 else
-	gcc -O2 ${LD_FLAGS} -o extract-xiso -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a
+	$(CC) -O2 ${LD_FLAGS} -o extract-xiso -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a
 endif
 
 ifeq (${TARGET_OS},__DARWIN__)
@@ -33,10 +38,10 @@ fat:
 	@echo
 	${MAKE} -C ${LIBFTP_DIR} clean
 	CFLAGS="-I. -O2 -D${TARGET_OS} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -mtune=G5" ${MAKE} -C ${LIBFTP_DIR}
-	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -mtune=G5 -O2 ${LD_FLAGS} -o extract-xiso.ppc -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a -framework CoreFoundation -framework DiscRecording
+	$(CC) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch ppc -mtune=G5 -O2 ${LD_FLAGS} -o extract-xiso.ppc -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a -framework CoreFoundation -framework DiscRecording
 	${MAKE} -C ${LIBFTP_DIR} clean
 	CFLAGS="-I. -O2 -D${TARGET_OS} -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -mtune=pentium4" ${MAKE} -C ${LIBFTP_DIR}
-	gcc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -mtune=pentium4 -O2 ${LD_FLAGS} -o extract-xiso.i386 -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a -framework CoreFoundation -framework DiscRecording
+	$(CC) -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -mtune=pentium4 -O2 ${LD_FLAGS} -o extract-xiso.i386 -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a -framework CoreFoundation -framework DiscRecording
 	lipo -create extract-xiso.ppc extract-xiso.i386 -output extract-xiso
 	rm -f extract-xiso.ppc extract-xiso.i386
 endif
@@ -45,16 +50,16 @@ static:
 	@echo "compiling static extract-xiso for ${TARGET_OS}"
 	@echo
 	${MAKE} libftp
-	gcc -O2 -static -o extract-xiso-static -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a -lpthread
+	$(CC) -O2 -static -o extract-xiso-static -D${TARGET_OS} extract-xiso.c ${LIBFTP_DIR}/libftp.a -lpthread
 	
 debug:
 	@echo "compiling debug extract-xiso for ${TARGET_OS}"
 	@echo
 	${MAKE} libftp-debug
 ifeq (${TARGET_OS},__DARWIN__)
-	gcc -g -o extract-xiso -D${TARGET_OS} -DDEBUG extract-xiso.c ${LIBFTP_DIR}/libftp.a -framework CoreFoundation -framework DiscRecording
+	$(CC) -g -o extract-xiso -D${TARGET_OS} -DDEBUG extract-xiso.c ${LIBFTP_DIR}/libftp.a -framework CoreFoundation -framework DiscRecording
 else
-	gcc -g -o extract-xiso -D${TARGET_OS} -DDEBUG extract-xiso.c ${LIBFTP_DIR}/libftp.a -lpthread
+	$(CC) -g -o extract-xiso -D${TARGET_OS} -DDEBUG extract-xiso.c ${LIBFTP_DIR}/libftp.a -lpthread
 endif
 
 libftp:
